@@ -1,0 +1,86 @@
+;
+; Midas.inf
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=Sample ; TODO: edit Class
+ClassGuid={78A1C341-4539-11d3-B88D-00C04FAD5171} ; TODO: edit ClassGuid
+Provider=%ManufacturerName%
+CatalogFile=Midas.cat
+DriverVer= ; TODO: set DriverVer in stampinf property pages
+
+[DestinationDirs]
+DefaultDestDir = 12
+Midas_Device_CoInstaller_CopyFiles = 11
+
+; ================= Class section =====================
+
+[ClassInstall32]
+Addreg=SampleClassReg
+
+[SampleClassReg]
+HKR,,,0,%ClassName%
+HKR,,Icon,,-5
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+Midas.sys  = 1,,
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=1 ; make sure the number matches with SourceDisksNames
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName%=Standard,NT$ARCH$
+
+[Standard.NT$ARCH$]
+%Midas.DeviceDesc%=Midas_Device, Root\Midas ; TODO: edit hw-id
+
+[Midas_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+Midas.sys
+
+;-------------- Service installation
+[Midas_Device.NT.Services]
+AddService = Midas,%SPSVCINST_ASSOCSERVICE%, Midas_Service_Inst
+
+; -------------- Midas driver install sections
+[Midas_Service_Inst]
+DisplayName    = %Midas.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\Midas.sys
+
+;
+;--- Midas_Device Coinstaller installation ------
+;
+
+[Midas_Device.NT.CoInstallers]
+AddReg=Midas_Device_CoInstaller_AddReg
+CopyFiles=Midas_Device_CoInstaller_CopyFiles
+
+[Midas_Device_CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfCoInstaller"
+
+[Midas_Device_CoInstaller_CopyFiles]
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll
+
+[Midas_Device.NT.Wdf]
+KmdfService =  Midas, Midas_wdfsect
+[Midas_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+ClassName="Samples" ; TODO: edit ClassName
+DiskName = "Midas Installation Disk"
+Midas.DeviceDesc = "Midas Device"
+Midas.SVCDESC = "Midas Service"
