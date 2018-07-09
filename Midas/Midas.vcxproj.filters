@@ -17,6 +17,9 @@
       <UniqueIdentifier>{8E41214B-6785-4CFE-B992-037D68949A14}</UniqueIdentifier>
       <Extensions>inf;inv;inx;mof;mc;</Extensions>
     </Filter>
+    <Filter Include="Header Files\Virtualizer">
+      <UniqueIdentifier>{f4244e3f-50f2-4cdd-af6f-5fc09c8be4ee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Inf Include="Midas.inf">
@@ -24,22 +27,13 @@
     </Inf>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="utils.c">
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="spoofer.c">
+    <ClCompile Include="iocontrol.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="hide_driver.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="main.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="serial_gen.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="iocontrol.c">
+    <ClCompile Include="utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -53,13 +47,7 @@
     <ClInclude Include="Structures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="spoofer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="utils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="hide_driver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="main.h">
@@ -68,5 +56,53 @@
     <ClInclude Include="iocontrol.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="StealthDataArea.h">
+      <Filter>Header Files\Virtualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="VirtualizerSDK.h">
+      <Filter>Header Files\Virtualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="StealthCodeArea.h">
+      <Filter>Header Files\Virtualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="StealthCodeArea_Max.h">
+      <Filter>Header Files\Virtualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="VirtualizerSDK_BorlandC_inline.h">
+      <Filter>Header Files\Virtualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="VirtualizerSDK_CustomVMs.h">
+      <Filter>Header Files\Virtualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="VirtualizerSDK_CustomVMs_BorlandC_inline.h">
+      <Filter>Header Files\Virtualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="VirtualizerSDK_CustomVMs_GNU_inline.h">
+      <Filter>Header Files\Virtualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="VirtualizerSDK_CustomVMs_ICL_inline.h">
+      <Filter>Header Files\Virtualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="VirtualizerSDK_CustomVMs_LCC_inline.h">
+      <Filter>Header Files\Virtualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="VirtualizerSDK_CustomVMs_VC_inline.h">
+      <Filter>Header Files\Virtualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="VirtualizerSDK_GNU_inline.h">
+      <Filter>Header Files\Virtualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="VirtualizerSDK_ICL_inline.h">
+      <Filter>Header Files\Virtualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="VirtualizerSDK_LCC_inline.h">
+      <Filter>Header Files\Virtualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="VirtualizerSDK_VC_inline.h">
+      <Filter>Header Files\Virtualizer</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="VirtualizerDDK.lib" />
   </ItemGroup>
 </Project>

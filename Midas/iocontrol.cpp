@@ -1,10 +1,13 @@
 #include "main.h"
+#include "utils.h"
+#include "IORequests.h"
 
 // IOCTL Call Handler function
 NTSTATUS io_control(PDEVICE_OBJECT device_object, PIRP irp)
 {
+	VIRTUALIZER_START
 	ULONG bytes_io = 0;
-	const PIO_STACK_LOCATION stack = IoGetCurrentIrpStackLocation(irp);
+	PIO_STACK_LOCATION stack = IoGetCurrentIrpStackLocation(irp);
 
 	// Code received from user space
 	const ULONG control_code = stack->Parameters.DeviceIoControl.IoControlCode;
@@ -19,22 +22,6 @@ NTSTATUS io_control(PDEVICE_OBJECT device_object, PIRP irp)
 
 		bytes_io = sizeof(COPY_MEMORY);
 	}
-	else if (control_code == IO_GET_ID_REQUEST)
-	{
-		PULONG OutPut = (PULONG)irp->AssociatedIrp.SystemBuffer;
-		*OutPut = procid;
-
-		irp->IoStatus.Status = STATUS_SUCCESS;
-		bytes_io = sizeof OutPut;
-	}
-	else if (control_code == IO_GET_MODULE_REQUEST)
-	{
-		PULONG OutPut = (PULONG)irp->AssociatedIrp.SystemBuffer;
-		*OutPut = client_address;
-
-		irp->IoStatus.Status = STATUS_SUCCESS;
-		bytes_io = sizeof OutPut;
-	}
 	else if (control_code == IO_GET_BASE_ADDRESS)
 	{
 		ULONGLONG base_address_out = 0;
@@ -45,6 +32,15 @@ NTSTATUS io_control(PDEVICE_OBJECT device_object, PIRP irp)
 
 		bytes_io = sizeof(BASE_ADDRESS);
 	}
+	else if (control_code == IO_CLEAN_UNLOADED_DRIVERS)
+	{
+		if (clean_unloaded_drivers())
+			irp->IoStatus.Status = STATUS_SUCCESS;
+		else
+			irp->IoStatus.Status = STATUS_UNSUCCESSFUL;
+			
+		bytes_io = 0;
+	}
 	else
 	{
 		irp->IoStatus.Status = STATUS_INVALID_PARAMETER;
@@ -54,31 +50,37 @@ NTSTATUS io_control(PDEVICE_OBJECT device_object, PIRP irp)
 	// Complete the request
 	irp->IoStatus.Information = bytes_io;
 	IoCompleteRequest(irp, IO_NO_INCREMENT);
-
+	VIRTUALIZER_END
 	return irp->IoStatus.Status;
 }
 
 NTSTATUS unload_driver(PDRIVER_OBJECT driver_object)
 {
+	VIRTUALIZER_START
 	IoDeleteSymbolicLink(&dos);
 	IoDeleteDevice(driver_object->DeviceObject);
+	VIRTUALIZER_END
 	return 0;
 }
 
 NTSTATUS create_call(PDEVICE_OBJECT device_object, PIRP irp)
 {
+	VIRTUALIZER_START
 	irp->IoStatus.Status = STATUS_SUCCESS;
 	irp->IoStatus.Information = 0;
 
 	IoCompleteRequest(irp, IO_NO_INCREMENT);
+	VIRTUALIZER_END
 	return STATUS_SUCCESS;
 }
 
 NTSTATUS close_call(PDEVICE_OBJECT device_object, PIRP irp)
 {
+	VIRTUALIZER_START
 	irp->IoStatus.Status = STATUS_SUCCESS;
 	irp->IoStatus.Information = 0;
 
 	IoCompleteRequest(irp, IO_NO_INCREMENT);
+	VIRTUALIZER_END
 	return STATUS_SUCCESS;
 }

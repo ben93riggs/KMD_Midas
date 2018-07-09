@@ -5,11 +5,9 @@
 #include <windef.h>
 
 #if DBG 
-#define Print(_x_) DbgPrint(_x_)
-#define PrintEx(_x_) DbgPrintEx(_x_)
+#define Print(_x_) DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, _x_)
 #else 
 #define Print(_x_)
-#define PrintEx(_x_) 
 #endif // DBG wudfwdm
 
 typedef unsigned long long QWORD;
