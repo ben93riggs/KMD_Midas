@@ -232,19 +232,6 @@ typedef struct _LDR_DATA_TABLE_ENTRY
 	ULONG TimeDateStamp;
 } LDR_DATA_TABLE_ENTRY, *PLDR_DATA_TABLE_ENTRY;
 
-typedef struct _NON_PAGED_DEBUG_INFO
-{
-	USHORT      Signature;
-	USHORT      Flags;
-	ULONG       Size;
-	USHORT      Machine;
-	USHORT      Characteristics;
-	ULONG       TimeDateStamp;
-	ULONG       CheckSum;
-	ULONG       SizeOfImage;
-	ULONGLONG   ImageBase;
-} NON_PAGED_DEBUG_INFO, *PNON_PAGED_DEBUG_INFO;
-
 typedef struct _KLDR_DATA_TABLE_ENTRY
 {
 	LIST_ENTRY InLoadOrderLinks;

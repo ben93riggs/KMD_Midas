@@ -241,9 +241,12 @@
       <WppKernelMode>true</WppKernelMode>
       <TreatWarningAsError>false</TreatWarningAsError>
       <WarningLevel>Level3</WarningLevel>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalOptions>/Zc:noexceptTypes %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
+    <Link />
     <Link>
-      <EntryPointSymbol>driver_initialize</EntryPointSymbol>
+      <EntryPointSymbol>DriverEntry</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -267,10 +270,12 @@
       <ProgramDataBaseFileName />
       <Optimization>Disabled</Optimization>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalOptions>/Zc:noexceptTypes %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <EntryPointSymbol>driver_entry</EntryPointSymbol>
       <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EntryPointSymbol>driver_entry</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
@@ -327,26 +332,11 @@
     <ClInclude Include="main.h" />
     <ClInclude Include="IORequests.h" />
     <ClInclude Include="ntos.h" />
-    <ClInclude Include="StealthCodeArea.h" />
-    <ClInclude Include="StealthCodeArea_Max.h" />
-    <ClInclude Include="StealthDataArea.h" />
     <ClInclude Include="Structures.h" />
     <ClInclude Include="utils.h" />
-    <ClInclude Include="VirtualizerSDK.h" />
-    <ClInclude Include="VirtualizerSDK_BorlandC_inline.h" />
-    <ClInclude Include="VirtualizerSDK_CustomVMs.h" />
-    <ClInclude Include="VirtualizerSDK_CustomVMs_BorlandC_inline.h" />
-    <ClInclude Include="VirtualizerSDK_CustomVMs_GNU_inline.h" />
-    <ClInclude Include="VirtualizerSDK_CustomVMs_ICL_inline.h" />
-    <ClInclude Include="VirtualizerSDK_CustomVMs_LCC_inline.h" />
-    <ClInclude Include="VirtualizerSDK_CustomVMs_VC_inline.h" />
-    <ClInclude Include="VirtualizerSDK_GNU_inline.h" />
-    <ClInclude Include="VirtualizerSDK_ICL_inline.h" />
-    <ClInclude Include="VirtualizerSDK_LCC_inline.h" />
-    <ClInclude Include="VirtualizerSDK_VC_inline.h" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="VirtualizerDDK.lib" />
+    <MASM Include="cfguard.asm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

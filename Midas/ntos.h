@@ -1,8 +1,7 @@
 #pragma once 
-#include <ntifs.h>
+#include <fltKernel.h>
 #include <ntddk.h>
-#include <ntdef.h>
-#include <windef.h>
+#include <ntimage.h>
 
 #if DBG 
 #define Print(_x_) DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, _x_)
@@ -12,13 +11,7 @@
 
 typedef unsigned long long QWORD;
 
-NTKERNELAPI
-NTSTATUS
-PsCreateSystemProcess(
-	OUT PHANDLE ProcessHandle,
-	IN ULONG DesiredAccess,
-	IN POBJECT_ATTRIBUTES ObjectAttributes
-);
+NTKERNELAPI NTSTATUS PsCreateSystemProcess(OUT PHANDLE ProcessHandle, IN ULONG DesiredAccess, IN POBJECT_ATTRIBUTES ObjectAttributes);
 
 typedef unsigned short WORD;
 
@@ -167,7 +160,7 @@ PsSetThreadWin32Thread(
 	IN PVOID PrevWin32Thread
 );
 
-NTKERNELAPI PVOID PsGetProcessSectionBaseAddress(PEPROCESS Process);
+EXTERN_C NTKERNELAPI PVOID PsGetProcessSectionBaseAddress(PEPROCESS Process);
 
 
 
@@ -1121,7 +1114,7 @@ MmQuerySystemSize(
 	VOID
 );
 
-NTSTATUS NTAPI MmCopyVirtualMemory
+EXTERN_C NTSTATUS NTAPI MmCopyVirtualMemory
 (
 	PEPROCESS SourceProcess,
 	PVOID SourceAddress,
@@ -1132,7 +1125,7 @@ NTSTATUS NTAPI MmCopyVirtualMemory
 	PSIZE_T ReturnSize
 );
 
-NTSTATUS ZwQuerySystemInformation(ULONG InfoClass, PVOID Buffer, ULONG Length, PULONG ReturnLength);
+EXTERN_C NTSTATUS ZwQuerySystemInformation(ULONG InfoClass, PVOID Buffer, ULONG Length, PULONG ReturnLength);
 LPSTR PsGetProcessImageFileName(PEPROCESS Process);
 
 

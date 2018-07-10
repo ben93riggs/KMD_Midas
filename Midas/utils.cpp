@@ -2,24 +2,25 @@
 #include "utils.h"
 #include <intrin.h>
 
-BOOLEAN b_data_compare(const BYTE* pData, const BYTE* bMask, const char* szMask) {
+
+extern "C" BOOLEAN b_data_compare(const unsigned char* pData, const unsigned char* bMask, const char* szMask) {
 	for (; *szMask; ++szMask, ++pData, ++bMask)
 		if (*szMask == 'x' && *pData != *bMask)
 			return 0;
 	return (*szMask) == 0;
 }
-UINT64 find_pattern(UINT64 dwAddress, UINT64 dwLen, BYTE *bMask, char * szMask) {
+extern "C" UINT64 find_pattern(UINT64 dwAddress, UINT64 dwLen, unsigned char *bMask, char * szMask) {
 	for (UINT64 i = 0; i < dwLen; i++) {
-		if (b_data_compare((BYTE*)(dwAddress + i), bMask, szMask)) {
+		if (b_data_compare((unsigned char*)(dwAddress + i), bMask, szMask)) {
 			return (UINT64)(dwAddress + i);
 		}
 	}
 	return 0;
 }
 
-BOOLEAN clean_unloaded_drivers()
+extern "C" BOOLEAN clean_unloaded_drivers()
 {
-	VIRTUALIZER_START
+	
 	ULONG bytes = 0;
 	NTSTATUS status = ZwQuerySystemInformation(SystemModuleInformation, 0, bytes, &bytes); //find out how many bytes to allocate
 	if (!bytes) 
@@ -43,7 +44,7 @@ BOOLEAN clean_unloaded_drivers()
 		return FALSE;
 
 	// NOTE: 4C 8B ? ? ? ? ? 4C 8B C9 4D 85 ? 74 + 3] + current signature address = MmUnloadedDrivers
-	UINT64 mm_unloaded_drivers_ptr = find_pattern(ntoskrnl_base, ntoskrnl_size, (BYTE*)"\x4C\x8B\x00\x00\x00\x00\x00\x4C\x8B\xC9\x4D\x85\x00\x74", "xx?????xxxxx?x");
+	UINT64 mm_unloaded_drivers_ptr = find_pattern(ntoskrnl_base, ntoskrnl_size, (unsigned char*)"\x4C\x8B\x00\x00\x00\x00\x00\x4C\x8B\xC9\x4D\x85\x00\x74", "xx?????xxxxx?x");
 
 	if (!mm_unloaded_drivers_ptr)
 		return FALSE;
@@ -64,13 +65,13 @@ BOOLEAN clean_unloaded_drivers()
 
 	// NOTE: clean the old buffer
 	ExFreePoolWithTag((PVOID)buffer_ptr, 0x54446D4D); // 'MmDT'
-	VIRTUALIZER_END
+	
 	return TRUE;
 }
 
-NTSTATUS copy_memory(IN PCOPY_MEMORY p_copy)
+extern "C" NTSTATUS copy_memory(IN PCOPY_MEMORY p_copy)
 {
-	VIRTUALIZER_START
+	
 	//RtlCopyMemory(pTarget, pSource, pCopy->size); //alternate method of copying memory. Why not to use: https://www.unknowncheats.me/forum/1543554-post3.html
 	//probing cant be used because it throws a SEH exception which is not compatible when mapping driver manually (without lots of work)
 
@@ -102,13 +103,13 @@ NTSTATUS copy_memory(IN PCOPY_MEMORY p_copy)
 
 	SIZE_T bytes = 0;
 	status = MmCopyVirtualMemory(p_source_proc, p_source, p_target_proc, p_target, p_copy->size, KernelMode, &bytes);
-	VIRTUALIZER_END
+	
 	return status;
 }
 
-NTSTATUS get_base_address(IN OUT PBASE_ADDRESS data)
+extern "C" NTSTATUS get_base_address(IN OUT PBASE_ADDRESS data)
 {
-	VIRTUALIZER_START
+	
 	PEPROCESS p_process = NULL;
 	const NTSTATUS status = PsLookupProcessByProcessId((HANDLE)data->PID, &p_process);
 
@@ -120,6 +121,51 @@ NTSTATUS get_base_address(IN OUT PBASE_ADDRESS data)
 	if (data->BaseAddress == 0)
 		return STATUS_UNSUCCESSFUL;
 
-	VIRTUALIZER_END
+	
 	return status;
+}
+
+extern "C" NTSTATUS CopyMajorFunctions(_In_reads_bytes_(count * sizeof(PDRIVER_DISPATCH)) PDRIVER_DISPATCH* src, _Out_writes_bytes_all_(count * sizeof(PDRIVER_DISPATCH)) PDRIVER_DISPATCH* dst, const SIZE_T size)
+{
+	constexpr auto major_functions = IRP_MJ_MAXIMUM_FUNCTION + 1;
+
+	if (size != major_functions)
+	{
+		return STATUS_INFO_LENGTH_MISMATCH;
+	}
+
+	for (unsigned i = 0; i < major_functions; ++i)
+	{
+		dst[i] = src[i];
+	}
+
+	return STATUS_SUCCESS;
+}
+
+extern "C" ULONGLONG SetCfgDispatch(const PDRIVER_OBJECT driver, const ULONGLONG new_dispatch)
+{
+	ULONG size = 0;
+	const auto directory = PIMAGE_LOAD_CONFIG_DIRECTORY(RtlImageDirectoryEntryToData(driver->DriverStart, TRUE, IMAGE_DIRECTORY_ENTRY_LOAD_CONFIG, &size));
+
+	if (directory != nullptr) {
+		if (directory->GuardFlags & IMAGE_GUARD_CF_INSTRUMENTED) {
+			{
+				const auto old_dispatch = directory->GuardCFDispatchFunctionPointer;
+
+				auto cr0 = __readcr0();
+
+				const auto old_cr0 = cr0;
+				// disable write protection
+				cr0 &= ~(1UL << 16);
+				__writecr0(cr0);
+
+				directory->GuardCFDispatchFunctionPointer = new_dispatch;
+
+				__writecr0(old_cr0);
+				return old_dispatch;
+			}
+		}
+	}
+
+	return 0;
 }
